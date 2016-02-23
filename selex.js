@@ -3,6 +3,7 @@ $(document).ready(function(){
 
     $.fn.selex = function(options) {
         var defaults = {
+          containerAttrs: { class: 'selex' },
           wrapperAttrs: { class: 'selex-wrapper' },
           buttonAttrs: { class: 'selex-button' },
           optionsAttrs: { class: 'selex-options' },
@@ -15,9 +16,7 @@ $(document).ready(function(){
           var select = $(this);
           var options = select.children();
 
-          select.before('<div></div>');
-
-          buildSelex(select, settings, options)
+          buildSelex(select, settings, options);
         });
 
         bindSelexClick();
@@ -29,10 +28,41 @@ $(document).ready(function(){
       var button = $('.selex-button');
       var option = $('.selex-option');
 
+      if (/Android/i.test(navigator.userAgent)) { androidClicker() }
+      else if (/iPhone/i.test(navigator.userAgent)) { iPhoneClicker(button) }
+      else { defaultClicker(button, option) }
+
+    }
+
+    function androidClicker() {
+      $('select').show();
+      $('select').on('change', function(){
+        var value = $(this).val();
+
+        $(this).prev()
+          .children('.selex-button')
+          .text(value);
+      });
+    }
+
+    function iPhoneClicker(button) {
+      button.click(function(){
+        var clicked = $(this)
+        var select = clicked.parent().prev();
+
+        select.show().focus();
+        select.on('change', function(){
+          clicked.text(select.val());
+          $(this).hide();
+        });
+      });
+    }
+
+    function defaultClicker(button, option) {
       button.click(function(){
         var options = $(this).next();
 
-        options.toggle();
+          options.toggle();
       });
 
       option.click(function(){
@@ -46,13 +76,16 @@ $(document).ready(function(){
         select.val(value);
         options.toggle();
         button.text(value);
-
       });
     }
 
     function buildSelex(select, settings, options) {
       var element = '<div></div>';
-      var wrapper = select.prev()
+      var select = select.wrap(element);
+      var container = select.parent()
+        .attr(settings.containerAttrs)
+        .append(element);
+      var wrapper = container.children().last()
         .attr(settings.wrapperAttrs)
         .append(element);
       var button = wrapper.children()
@@ -80,10 +113,14 @@ $(document).ready(function(){
 
 
     function getSelectValue(select, options){
-      if(options.filter(':selected'))
-        return options.filter(':selected').val()
-      else
+      if(options.filter(':selected')) {
+        var selected = options.filter(':selected');
+
+        return selected.val()
+      }
+      else {
         return 'Select an Option'
+      }
     }
   }( jQuery ));
 

@@ -5,9 +5,16 @@ section {
 
 select {
   display: none;
+  opacity: 0;
+  position: absolute;
+  top:0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  width: 100%;
 }
 
-.selex-wrapper {
+.selex {
   position: relative;
 }
 
@@ -17,6 +24,15 @@ select {
   position: relative;
   padding: 10px 20px;
 }
+
+.selex-button:after {
+  content: '\02C5';
+  display: block;
+  position: absolute;
+  right: 20px;
+  top: 50%;
+}
+
 
 .selex-options {
   display: none;
