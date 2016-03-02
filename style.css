@@ -26,6 +26,10 @@ select {
   padding: 10px 20px;
 }
 
+.selex-button.active {
+  background-color: green;
+}
+
 .selex-button:after {
   content: '\02C5';
   display: block;
