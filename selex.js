@@ -2,7 +2,7 @@
 
   $.fn.selex = function(options) {
       var defaults = {
-        containerAttrs: { class: 'selex' },
+        containerAttrs: { class: 'selex', },
         wrapperAttrs: { class: 'selex-wrapper' },
         buttonAttrs: { class: 'selex-button' },
         optionsAttrs: { class: 'selex-options' },
@@ -36,11 +36,11 @@
   function androidClicker() {
     $('select').show();
     $('select').on('change', function(){
-      var value = $(this).val();
+      var text = $(this).find('option:selected').text();
 
-      $(this).prev()
+      $(this).next()
         .children('.selex-button')
-        .text(value);
+        .text(text);
     });
   }
 
@@ -51,14 +51,19 @@
 
       select.show().focus();
       select.on('change', function(){
-        clicked.text(select.val());
+        var text = $(this).find('option:selected').text();
+
+        clicked.text(text);
         $(this).hide();
       });
     });
   }
 
   function defaultClicker(button, option) {
-    $(document).click(function(e){
+    var doc = $(document);
+
+    doc.off('click');
+    doc.click(function(e){
       var clicked = $(e.target);
 
       if (clicked.is('.selex-button')) {
@@ -72,14 +77,15 @@
     option.click(function(){
       var option = $(this);
       var options = $(this).parent('.selex-options');
-      var value = option.text();
+      var value = option.attr('value');
+      var text = option.text();
       var selex = options.parent('.selex-wrapper');
       var button = options.prev();
-      var select = selex.next();
+      var select = selex.prev();
 
       select.val(value);
-      options.toggle();
-      button.text(value);
+      select.trigger('change');
+      button.text(text);
     });
   }
 
@@ -88,6 +94,7 @@
     var select = select.wrap(element);
     var container = select.parent()
       .attr(settings.containerAttrs)
+      .addClass(select.attr('class'))
       .append(element);
     var wrapper = container.children().last()
       .attr(settings.wrapperAttrs)
@@ -106,10 +113,12 @@
 
   function buildSelexOption(options) {
     var html = options.map(function(){
-      var value = $(this).val();
+      var option = $(this);
+      var value = option.val();
+      var text = option.text();
 
       if (value) {
-        return ['<div>',value,'</div>'].join('');
+        return ['<div value="',value,'">',text,'</div>'].join('');
       }
 
     }).get().join('');
@@ -127,7 +136,7 @@
     if(options.filter(':selected')) {
       var selected = options.filter(':selected');
 
-      return selected.val()
+      return selected.text()
     }
     else {
       return 'Select an Option'
